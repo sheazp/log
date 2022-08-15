@@ -13,6 +13,7 @@ var lct *log.LogCtrl
 func main_test() {
 	lct = &log.LogCtrl{}
 	logFile := "./log/mylog.go.log"
+	//lct.Init(logFile) //默认DEBUG等级
 	//lct.Init(logFile, log.INFO) //初始化为INFO等级
 	//lct.Init(logFile, "ADV")    //开启重要日志配置,默认DEBUG等级
 	lct.Init(logFile, log.ERROR, "ADV") //初始化为ERROR等级，并且开启重要日志配置
