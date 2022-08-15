@@ -39,8 +39,8 @@ func main_test() {
 
 	for {
 		var lv int = 0
-		fmt.Scan(&lv)
-		fmt.Printf("set level change:%v -> %v\n", log.LogLevel(0) , log.LogLevel(lv))
+		fmt.Scan(&lv) //终端输入一个要切换的日志等级
+		fmt.Printf("set level change:%v -> %v\n", log.LogLevel(0) , log.LogLevel(lv)) // 0 代表获取值，不变更原来等级
 	}
 }
 */
