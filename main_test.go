@@ -17,9 +17,9 @@ func main_test() {
 	//lct.Init(logFile, log.INFO) //初始化为INFO等级
 	//lct.Init(logFile, "ADV")    //开启重要日志配置,默认DEBUG等级
 	lct.Init(logFile, log.ERROR, "ADV") //初始化为ERROR等级，并且开启重要日志配置
-	lct.ResetCompressSize(101 * 1024) //单位：KB,重置压缩的阈值，默认20MB
-	lct.SetZipMaxCount(30) //当满足30个压缩包后开始清理最早的包
-	lct.SetClearSize(100 * 1024*1024) // 默认压缩大小超过100MB，删除最前的日志
+	lct.ResetCompressSize(101 * 1024) //单位：KB,重置压缩的阈值，默认20MB，不能小于100KB
+	lct.SetZipMaxCount(30) //当满足30个压缩包后开始清理最早的包，不能小于30
+	lct.SetClearSize(100 * 1024*1024) // 当压缩包总大小超过时，删除最前的日志，默认压缩总大小100MB
 	go lct.Run()
 
 	go func() {
