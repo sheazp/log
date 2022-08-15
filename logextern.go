@@ -31,7 +31,7 @@ func LogLevel(lv int) int {
 	return std.LogLevel(lv)
 }
 
-func Infof(format string, v ...any) {
+func Infof(format string, v ...interface{}) {
 	if atomic.LoadInt32(&std.isDiscard) != 0 {
 		return
 	}
@@ -43,7 +43,7 @@ func Infof(format string, v ...any) {
 
 // Printf calls l.Output to print to the logger.
 // Arguments are handled in the manner of fmt.Printf.
-func (l *Logger) Infof(format string, v ...any) {
+func (l *Logger) Infof(format string, v ...interface{}) {
 	if atomic.LoadInt32(&l.isDiscard) != 0 {
 		return
 	}
@@ -53,7 +53,7 @@ func (l *Logger) Infof(format string, v ...any) {
 	l.Output(2, fmt.Sprintf(format, v...))
 }
 
-func Debugf(format string, v ...any) {
+func Debugf(format string, v ...interface{}) {
 	if atomic.LoadInt32(&std.isDiscard) != 0 {
 		return
 	}
@@ -65,7 +65,7 @@ func Debugf(format string, v ...any) {
 
 // Printf calls l.Output to print to the logger.
 // Arguments are handled in the manner of fmt.Printf.
-func (l *Logger) Debugf(format string, v ...any) {
+func (l *Logger) Debugf(format string, v ...interface{}) {
 	if atomic.LoadInt32(&l.isDiscard) != 0 {
 		return
 	}
@@ -76,7 +76,7 @@ func (l *Logger) Debugf(format string, v ...any) {
 	l.Output(2, fmt.Sprintf(format, v...))
 }
 
-func Errorf(format string, v ...any) {
+func Errorf(format string, v ...interface{}) {
 	if atomic.LoadInt32(&std.isDiscard) != 0 {
 		return
 	}
@@ -91,7 +91,7 @@ func Errorf(format string, v ...any) {
 
 // Printf calls l.Output to print to the logger.
 // Arguments are handled in the manner of fmt.Printf.
-func (l *Logger) Errorf(format string, v ...any) {
+func (l *Logger) Errorf(format string, v ...interface{}) {
 	if atomic.LoadInt32(&l.isDiscard) != 0 {
 		return
 	}
@@ -101,7 +101,7 @@ func (l *Logger) Errorf(format string, v ...any) {
 	l.Output(2, fmt.Sprintf(format, v...))
 }
 
-func Warnf(format string, v ...any) {
+func Warnf(format string, v ...interface{}) {
 	if atomic.LoadInt32(&std.isDiscard) != 0 {
 		return
 	}
@@ -116,7 +116,7 @@ func Warnf(format string, v ...any) {
 
 // Printf calls l.Output to print to the logger.
 // Arguments are handled in the manner of fmt.Printf.
-func (l *Logger) Warnf(format string, v ...any) {
+func (l *Logger) Warnf(format string, v ...interface{}) {
 	if atomic.LoadInt32(&l.isDiscard) != 0 {
 		return
 	}
@@ -126,7 +126,7 @@ func (l *Logger) Warnf(format string, v ...any) {
 	l.Output(2, fmt.Sprintf(format, v...))
 }
 
-func Tracef(format string, v ...any) {
+func Tracef(format string, v ...interface{}) {
 	if atomic.LoadInt32(&std.isDiscard) != 0 {
 		return
 	}
@@ -138,7 +138,7 @@ func Tracef(format string, v ...any) {
 
 // Printf calls l.Output to print to the logger.
 // Arguments are handled in the manner of fmt.Printf.
-func (l *Logger) Tracef(format string, v ...any) {
+func (l *Logger) Tracef(format string, v ...interface{}) {
 	if atomic.LoadInt32(&l.isDiscard) != 0 {
 		return
 	}
