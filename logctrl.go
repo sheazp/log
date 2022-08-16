@@ -325,20 +325,18 @@ func (this *LogCtrl) doclear(logName string) {
 			//fmt.Printf("f %s, not contain %s\n", f, "." + this.CompressMethod)
 			continue
 		}
-		z := zipfile{}
-		z.FileName = f
-		z.PathName = this.Directory + DIRCHAR + f
-		z.LastModifyTime = getFileModTime(z.PathName)
-		z.FileSize = getFileSize(z.PathName)
-		zipSize = zipSize + z.FileSize
+
+		PathName = this.Directory + DIRCHAR + f
+		LastModifyTime = getFileModTime(z.PathName)
+		FileSize = getFileSize(z.PathName)
+		zipSize = zipSize + FileSize
 		t := LogFile{
-			Target:  z.PathName,
-			Size:    z.FileSize,
-			ModifyT: z.LastModifyTime,
+			Target:  PathName,
+			Size:    FileSize,
+			ModifyT: LastModifyTime,
 		}
 		delTargets = append(delTargets, t)
 		zipCount++
-		//zipFInfo = append(zipFInfo, z)
 	}
 	if len(delTargets) > 1 {
 		//按时间顺序排列
@@ -346,13 +344,10 @@ func (this *LogCtrl) doclear(logName string) {
 			return delTargets[i].ModifyT < delTargets[j].ModifyT
 		})
 	}
-	// for i, d := range delTargets {
-	// 	fmt.Printf("t: %v  %v\n", i, d.ModifyT)
-	// }
 	// fmt.Printf("zipCount: %d , conut: %d\n", zipCount, len(delTargets))
 	// fmt.Printf("TotalZie: %d , MaxSize: %d\n", zipSize, this.AllZipMaxSize)
 	//按时间顺序判断是否删除
-	for len(delTargets) > int(zipCount) || zipSize > this.AllZipMaxSize {
+	for len(delTargets) > int(this.ZipMaxCount) || zipSize > this.AllZipMaxSize {
 		delTarget := delTargets[0]
 		fmt.Println("[logctrl]clear log file:", delTarget)
 		err := os.Remove(delTarget.Target) //删除文件
