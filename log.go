@@ -139,7 +139,7 @@ func (l *Logger) formatHeader(buf *[]byte, t time.Time, file string, line int) {
 			itoa(buf, sec, 2)
 			if l.flag&Lmicroseconds != 0 {
 				*buf = append(*buf, '.')
-				itoa(buf, t.Nanosecond()/1e3, 6)
+				itoa(buf, t.Nanosecond()/1e3, 3)
 			}
 			*buf = append(*buf, ' ')
 		}
