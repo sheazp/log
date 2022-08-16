@@ -82,7 +82,7 @@ func init() {
 }
 func (this *LogCtrl) resetLogWriter(l *Logger, stdout bool, fileName string) {
 	file, _ := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	l.SetFlags(Ldate | Ltime | Lshortfile)
+	l.SetFlags(Ldate | Ltime | Lshortfile | Lmicroseconds)
 
 	writers := []io.Writer{file}
 	if stdout {
