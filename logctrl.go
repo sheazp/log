@@ -326,9 +326,9 @@ func (this *LogCtrl) doclear(logName string) {
 			continue
 		}
 
-		PathName = this.Directory + DIRCHAR + f
-		LastModifyTime = getFileModTime(z.PathName)
-		FileSize = getFileSize(z.PathName)
+		PathName := this.Directory + DIRCHAR + f
+		LastModifyTime := getFileModTime(PathName)
+		FileSize := getFileSize(PathName)
 		zipSize = zipSize + FileSize
 		t := LogFile{
 			Target:  PathName,
