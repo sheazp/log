@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 
 	"reflect"
 	"runtime"
@@ -164,7 +165,7 @@ func (this *LogCtrl) LogInit(FileName string, StdOut bool, level int, advLogEn b
 	this.StdOut = StdOut
 	this.FileName = FileName
 	this.CompressMethod = "zip"            // 默认zip格式
-	this.TrigerSize = 20 * 1024 * 1024     // 默认10MB进行压缩
+	this.TrigerSize = 20 * 1024 * 1024     // 默认20MB进行压缩
 	this.AllZipMaxSize = 100 * 1024 * 1024 // 默认压缩大小超过100MB，删除最前的日志
 	this.ZipMaxCount = 30                  // 默认压缩包个数最大20
 	n := strings.LastIndexByte(FileName, byte(DIRCHAR[0]))
@@ -225,7 +226,9 @@ func (this *LogCtrl) Run() {
 	}
 	//进来首次检查是否需要清理日志压缩文件
 	this.doclear(this.LogName)
-	this.doclear(this.LogNameAdv)
+	if this.LogAdvEn {
+		this.doclear(this.LogNameAdv)
+	}
 
 	this.resetLogWriter(this.Std, this.StdOut, this.FileName)
 	if this.LogAdvEn {
@@ -302,10 +305,16 @@ func (this *LogCtrl) doclear(logName string) {
 				fileArray = append(fileArray, info.Name())
 			}
 		}
+		return nil
 	})
-	delTarget := ""
+	type LogFile struct {
+		Target  string
+		Size    int64
+		ModifyT int64
+	}
+	delTargets := []LogFile{}
+
 	zipCount := int64(0)
-	targetModTime := time.Now().Unix()
 	zipSize := int64(0)
 	for _, f := range fileArray {
 		if !strings.HasPrefix(f, logName+".log@") {
@@ -322,24 +331,40 @@ func (this *LogCtrl) doclear(logName string) {
 		z.LastModifyTime = getFileModTime(z.PathName)
 		z.FileSize = getFileSize(z.PathName)
 		zipSize = zipSize + z.FileSize
-		if targetModTime > z.LastModifyTime {
-			targetModTime = z.LastModifyTime
-			delTarget = z.PathName
+		t := LogFile{
+			Target:  z.PathName,
+			Size:    z.FileSize,
+			ModifyT: z.LastModifyTime,
 		}
+		delTargets = append(delTargets, t)
 		zipCount++
 		//zipFInfo = append(zipFInfo, z)
 	}
-	//fmt.Printf("TotalZie: %d , MaxSize: %d\n", zipSize, this.AllZipMaxSize)
-	if zipSize > this.AllZipMaxSize || zipCount > this.ZipMaxCount {
-		if len(delTarget) > 0 {
-			//每次只删除
-			fmt.Println("[logctrl]clear log file:", delTarget)
-			err := os.Remove(delTarget) //删除文件
-			if err != nil {
-				Println("[Logctrl] File remove fail: ", err)
-				return
-			}
+	if len(delTargets) > 1 {
+		//按时间顺序排列
+		sort.SliceStable(delTargets, func(i int, j int) bool {
+			return delTargets[i].ModifyT < delTargets[j].ModifyT
+		})
+	}
+	// for i, d := range delTargets {
+	// 	fmt.Printf("t: %v  %v\n", i, d.ModifyT)
+	// }
+	// fmt.Printf("zipCount: %d , conut: %d\n", zipCount, len(delTargets))
+	// fmt.Printf("TotalZie: %d , MaxSize: %d\n", zipSize, this.AllZipMaxSize)
+	//按时间顺序判断是否删除
+	for len(delTargets) > int(zipCount) || zipSize > this.AllZipMaxSize {
+		delTarget := delTargets[0]
+		fmt.Println("[logctrl]clear log file:", delTarget)
+		err := os.Remove(delTarget.Target) //删除文件
+		if err != nil {
+			Println("[Logctrl] File remove fail: ", err)
+			return
+		}
+		zipSize -= delTarget.Size
+		if len(delTargets) > 1 {
+			delTargets = delTargets[1:]
 		}
 	}
+
 	return
 }
