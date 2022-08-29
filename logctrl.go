@@ -15,6 +15,8 @@ import (
 	"github.com/mholt/archiver"
 )
 
+type PollLogLvCb func() int
+
 var g_advLog *Logger = nil
 
 type LogCtrl struct {
@@ -36,6 +38,8 @@ type LogCtrl struct {
 	StdOut        bool  // 是否终端打印日志
 	AllZipMaxSize int64 // 压缩文件最大总大小
 	ZipMaxCount   int64 // 压缩文件最大个数
+	logLvChk      PollLogLvCb //动态更新外部应用设置的日志等级
+
 }
 
 func getFileSize(FileName string) int64 {
@@ -234,7 +238,7 @@ func (this *LogCtrl) Run() {
 	if this.LogAdvEn {
 		this.resetLogWriter(this.AdvLog, false, this.FileNameAdv)
 	}
-
+	var CurLoglv int
 	for {
 		zipcnt := this.doLogJobs(this.Std, this.StdOut, this.LogName, this.FileName)
 		if zipcnt > 0 {
@@ -247,6 +251,13 @@ func (this *LogCtrl) Run() {
 			if zipcnt > 0 {
 				this.CompresAdvCnt += zipcnt
 				this.doclear(this.LogNameAdv) //有新增压缩包，则需判断是否清除重要日志
+			}
+		}
+		if this.logLvChk != nil {
+			loglev := this.logLvChk()
+			if loglev != CurLoglv {
+				LogLevel(loglev)
+				CurLoglv = loglev
 			}
 		}
 		time.Sleep(time.Duration(5) * time.Second)
@@ -273,6 +284,12 @@ func (this *LogCtrl) SetZipMaxCount(count int64) {
 	}
 	this.ZipMaxCount = count
 	Println("[Logctrl] Logctrl ZipMaxCount = ", this.ZipMaxCount)
+}
+
+func (this *LogCtrl) SetLogLevelChkCb(lchk PollLogLvCb) {
+	if lchk != nil {
+		this.logLvChk = lchk
+	}
 }
 
 func getFileModTime(path string) int64 {
