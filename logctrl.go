@@ -195,9 +195,9 @@ func (this *LogCtrl) LogInit(FileName string, StdOut bool, level int, advLogEn b
 		this.FileNameAdv = strings.Replace(this.FileName, this.LogName, this.LogNameAdv, -1)
 		this.AdvLog = New(os.Stderr, "", LstdFlags)
 		g_advLog = this.AdvLog
-		//this.resetLogWriter(this.AdvLog, false, this.FileNameAdv)
+		this.resetLogWriter(this.AdvLog, false, this.FileNameAdv)
 	}
-	//this.resetLogWriter(this.Std, this.StdOut, this.FileName)
+	this.resetLogWriter(this.Std, this.StdOut, this.FileName)
 
 	fmt.Println("LogFile: ", this.FileName)
 	fmt.Println("LogDir: ", this.Directory)
