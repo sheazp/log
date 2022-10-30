@@ -94,7 +94,7 @@ func CreateDir(path string) {
 	if _exist {
 		fmt.Println("文件夹已存在！")
 	} else {
-		err := os.Mkdir(path, os.ModePerm)
+		err := os.MkdirAll(path, os.ModePerm)
 		if err != nil {
 			fmt.Printf("创建目录异常 -> %v\n", err)
 		} else {
