@@ -76,6 +76,33 @@ func fileZip(src_file, zip_file string) bool {
 	return true
 }
 
+
+func PathExist(path string) bool {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+	return false
+}
+//创建文件夹
+func CreateDir(path string) {
+	_exist := PathExist(path)
+
+	if _exist {
+		fmt.Println("文件夹已存在！")
+	} else {
+		err := os.Mkdir(path, os.ModePerm)
+		if err != nil {
+			fmt.Printf("创建目录异常 -> %v\n", err)
+		} else {
+			fmt.Println("创建成功!")
+		}
+	}
+}
+
 var DIRCHAR string = "/"
 
 func init() {
@@ -165,6 +192,9 @@ func (this *LogCtrl) LogInit(FileName string, StdOut bool, level int, advLogEn b
 		fmt.Printf("Find set level=%v\n", level)
 		std.LogLevel(level)
 	}
+	if runtime.GOOS == "windows" {
+		FileName = strings.ReplaceAll(FileName,"/","\\")
+	}
 	this.Std = std
 	this.StdOut = StdOut
 	this.FileName = FileName
@@ -178,6 +208,7 @@ func (this *LogCtrl) LogInit(FileName string, StdOut bool, level int, advLogEn b
 		n = 0
 	} else {
 		this.Directory = FileName[0:n]
+		CreateDir(this.Directory) //无此文件夹则创建
 	}
 	s := strings.LastIndexByte(FileName, '.')
 	if s < 0 {
