@@ -34,10 +34,11 @@ type LogCtrl struct {
 	FileNameAdv   string  // 原始文件名
 	CompresAdvCnt int
 	LogAdvEn      bool
+	LogFlags      int //设置日志输出格式
 
-	StdOut        bool  // 是否终端打印日志
-	AllZipMaxSize int64 // 压缩文件最大总大小
-	ZipMaxCount   int64 // 压缩文件最大个数
+	StdOut        bool        // 是否终端打印日志
+	AllZipMaxSize int64       // 压缩文件最大总大小
+	ZipMaxCount   int64       // 压缩文件最大个数
 	logLvChk      PollLogLvCb //动态更新外部应用设置的日志等级
 
 }
@@ -76,7 +77,6 @@ func fileZip(src_file, zip_file string) bool {
 	return true
 }
 
-
 func PathExist(path string) bool {
 	_, err := os.Stat(path)
 	if err == nil {
@@ -87,7 +87,8 @@ func PathExist(path string) bool {
 	}
 	return false
 }
-//创建文件夹
+
+// 创建文件夹
 func CreateDir(path string) {
 	_exist := PathExist(path)
 
@@ -114,7 +115,7 @@ func init() {
 }
 func (this *LogCtrl) resetLogWriter(l *Logger, stdout bool, fileName string) {
 	file, _ := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	l.SetFlags(Ldate | Ltime | Lshortfile | Lmicroseconds)
+	l.SetFlags(this.LogFlags) //(Ldate | Ltime | Lshortfile | Lmicroseconds)
 
 	writers := []io.Writer{file}
 	if stdout {
@@ -182,6 +183,24 @@ func parseParam(params ...interface{}) (level int, advEnable bool) {
 	return
 }
 
+func (this *LogCtrl) ResetLogFlags(flags int) {
+	this.LogFlags = flags
+	this.Std.SetFlags(this.LogFlags)
+	if this.LogAdvEn {
+		this.AdvLog.SetFlags(this.LogFlags)
+	}
+}
+
+func (this *LogCtrl) LogFlagsWithoutFileInfo() {
+	this.LogFlags = this.LogFlags & (~Lshortfile)
+	this.LogFlags = this.LogFlags & (~Llongfile)
+
+	this.Std.SetFlags(this.LogFlags)
+	if this.LogAdvEn {
+		this.AdvLog.SetFlags(this.LogFlags)
+	}
+}
+
 func (this *LogCtrl) LogInit(FileName string, StdOut bool, level int, advLogEn bool) {
 	if len(FileName) == 0 {
 		FileName = "default.log"
@@ -193,8 +212,10 @@ func (this *LogCtrl) LogInit(FileName string, StdOut bool, level int, advLogEn b
 		std.LogLevel(level)
 	}
 	if runtime.GOOS == "windows" {
-		FileName = strings.ReplaceAll(FileName,"/","\\")
+		FileName = strings.ReplaceAll(FileName, "/", "\\")
 	}
+
+	this.LogFlags = Ldate | Ltime | Lshortfile | Lmicroseconds
 	this.Std = std
 	this.StdOut = StdOut
 	this.FileName = FileName
