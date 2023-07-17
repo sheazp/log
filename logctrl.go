@@ -215,7 +215,9 @@ func (this *LogCtrl) LogInit(FileName string, StdOut bool, level int, advLogEn b
 		FileName = strings.ReplaceAll(FileName, "/", "\\")
 	}
 
-	this.LogFlags = Ldate | Ltime | Lshortfile | Lmicroseconds
+	if this.LogFlags == 0 {
+		this.LogFlags = Ldate | Ltime | Lshortfile | Lmicroseconds
+	}
 	this.Std = std
 	this.StdOut = StdOut
 	this.FileName = FileName
