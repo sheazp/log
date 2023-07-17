@@ -192,8 +192,8 @@ func (this *LogCtrl) ResetLogFlags(flags int) {
 }
 
 func (this *LogCtrl) LogFlagsWithoutFileInfo() {
-	this.LogFlags = this.LogFlags & (~Lshortfile)
-	this.LogFlags = this.LogFlags & (~Llongfile)
+	this.LogFlags = this.LogFlags & (^Lshortfile)
+	this.LogFlags = this.LogFlags & (^Llongfile)
 
 	this.Std.SetFlags(this.LogFlags)
 	if this.LogAdvEn {
