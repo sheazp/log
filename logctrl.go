@@ -189,7 +189,7 @@ func (this *LogCtrl) UnitInit(FileName string, params ...interface{}) *Logger {
 	}
 
 	this.Std = New(os.Stderr, "", LstdFlags) //独立创建单独的Log模块
-	this.LogInit(FileName, StdOut, level, advLogEn)
+	this.LogInit(FileName, true, level, advEnable)
 	return this.Std
 }
 
