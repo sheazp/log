@@ -160,6 +160,40 @@ func (this *LogCtrl) Init(FileName string, params ...interface{}) {
 	this.LogInit(FileName, true, level, advEnable)
 }
 
+
+/*
+单元日志记录，单独记录的日志文件
+*/
+func (this *LogCtrl) UnitInit(FileName string, params ...interface{}) *Logger {
+	var level int = 0
+	var configs string = ""
+	//配置参数解析
+	for _, u := range params {
+		switch u.(type) {
+		case int:
+			level = u.(int)
+		case int64:
+			level = int(u.(int64))
+		case int32:
+			level = int(u.(int32))
+		case string:
+			configs += u.(string) + "|"
+		default:
+			fmt.Printf("Unknow type:%v\n", reflect.TypeOf(u))
+		}
+	}
+	//获取配置
+	var advEnable bool = false
+	if strings.Contains(configs, "ADV") {
+		advEnable = true
+	}
+
+	this.Std = New(os.Stderr, "", LstdFlags) //独立创建单独的Log模块
+	this.LogInit(FileName, StdOut, level, advLogEn)
+	return this.Std
+}
+
+
 func parseParam(params ...interface{}) (level int, advEnable bool) {
 	configs := ""
 	for _, u := range params {
@@ -199,10 +233,6 @@ func (this *LogCtrl) LogFlagsWithoutFileInfo() {
 	if this.LogAdvEn {
 		this.AdvLog.SetFlags(this.LogFlags)
 	}
-}
-func (this *LogCtrl) LogUnitInit(FileName string, StdOut bool, level int, advLogEn bool) {
-	this.Std = New(os.Stderr, "", LstdFlags) //独立创建单独的Log模块
-	this.LogInit(FileName, StdOut, level, advLogEn)
 }
 
 func (this *LogCtrl) GetLogger() *Logger {
