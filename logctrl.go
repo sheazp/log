@@ -200,6 +200,15 @@ func (this *LogCtrl) LogFlagsWithoutFileInfo() {
 		this.AdvLog.SetFlags(this.LogFlags)
 	}
 }
+func (this *LogCtrl) LogUnitInit(FileName string, StdOut bool, level int, advLogEn bool) {
+	this.Std = New(os.Stderr, "", LstdFlags) //独立创建单独的Log模块
+	this.LogInit(FileName, StdOut, level, advLogEn)
+}
+
+func (this *LogCtrl) GetLogger() *Logger {
+	return this.Std
+}
+
 
 func (this *LogCtrl) LogInit(FileName string, StdOut bool, level int, advLogEn bool) {
 	if len(FileName) == 0 {
@@ -218,7 +227,9 @@ func (this *LogCtrl) LogInit(FileName string, StdOut bool, level int, advLogEn b
 	if this.LogFlags == 0 {
 		this.LogFlags = Ldate | Ltime | Lshortfile | Lmicroseconds
 	}
-	this.Std = std
+	if this.Std == nil {
+		this.Std = std
+	}
 	this.StdOut = StdOut
 	this.FileName = FileName
 	this.CompressMethod = "zip"            // 默认zip格式
